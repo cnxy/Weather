@@ -30,7 +30,10 @@ namespace Weather
                 comboBoxProvince.ComboBox.DisplayMember = "Name";
             });
             PlaceModel[] provinces = Place.GetProvinces();
-            this.InvokeToForm(() => comboBoxProvince.ComboBox.DataSource = provinces);  
+            if(provinces != null)
+            {
+                this.InvokeToForm(() => comboBoxProvince.ComboBox.DataSource = provinces);
+            }
         }
         
         private void BindCity()
@@ -42,23 +45,33 @@ namespace Weather
                 comboBoxCity.ComboBox.DisplayMember = "Name";
                 city = comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
             });
-            PlaceModel[] citys = Place.GetCitys(city);
-            this.InvokeToForm(() => comboBoxCity.ComboBox.DataSource = citys);
+            if(city != null)
+            {
+                PlaceModel[] citys = Place.GetCitys(city);
+                this.InvokeToForm(() => comboBoxCity.ComboBox.DataSource = citys);
+            }
         }
 
         private void BindDistrict()
         {
-            PlaceModel provinces = null;
+            PlaceModel province = null;
             PlaceModel city = null;
             this.InvokeToForm(() =>
             {
                 comboBoxDistrict.ComboBox.ValueMember = "ID";
                 comboBoxDistrict.ComboBox.DisplayMember = "Name";
-                provinces = comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
+                province = comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
                 city = comboBoxCity.ComboBox.SelectedItem as PlaceModel;
             });
-            PlaceModel[] districts = Place.GetDistricts(provinces, city);
-            this.InvokeToForm(() => comboBoxDistrict.ComboBox.DataSource = districts);
+            if(province != null && city != null)
+            {
+                PlaceModel[] districts = Place.GetDistricts(province, city);
+                this.InvokeToForm(() => comboBoxDistrict.ComboBox.DataSource = districts);
+            }
+            else
+            {
+                this.InvokeToForm(() => lblStatus.Text = "地区加载错误，请确保联网正确");
+            }
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -208,9 +221,12 @@ namespace Weather
                 PlaceModel province = comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
                 PlaceModel city = comboBoxCity.ComboBox.SelectedItem as PlaceModel;
                 PlaceModel district = comboBoxDistrict.ComboBox.SelectedItem as PlaceModel;
-                areas.Add(new Area() { Name = district.Name, Province = province, City = city, District = district });
-                XmlOperator.Serialize(path,areas);
-                BindMenu();
+                if(province != null && city != null && district != null)
+                { 
+                    areas.Add(new Area() { Name = district.Name, Province = province, City = city, District = district });
+                    XmlOperator.Serialize(path,areas);
+                    BindMenu();
+                }
             };
             buttonCustom.DropDownItems.Add(toolStripMenuItem1);
 
@@ -225,9 +241,12 @@ namespace Weather
                 PlaceModel province = comboBoxProvince.ComboBox.SelectedItem as PlaceModel;
                 PlaceModel city = comboBoxCity.ComboBox.SelectedItem as PlaceModel;
                 PlaceModel district = comboBoxDistrict.ComboBox.SelectedItem as PlaceModel;
-                areas.Remove(new Area() { Name = district.Name, Province = province, City = city, District = district });
-                XmlOperator.Serialize(path, areas);
-                BindMenu();
+                if (province != null && city != null && district != null)
+                {
+                    areas.Remove(new Area() { Name = district.Name, Province = province, City = city, District = district });
+                    XmlOperator.Serialize(path, areas);
+                    BindMenu();
+                }
             };
             buttonCustom.DropDownItems.Add(toolStripMenuItem2);
         }
