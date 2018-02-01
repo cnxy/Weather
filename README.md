@@ -5,3 +5,4 @@
 #### 2、显示1-7天一周的天气预报及未来8-15天的天气预报；
 #### 3、能定制地区的天气预报。
 ## 界面
+![image](https://github.com/cnxy/Weather/blob/master/Weather/pic.png)
